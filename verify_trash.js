@@ -2,14 +2,14 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'https://voultback.onrender.com/api';
 let TOKEN = '';
 
 async function run() {
   try {
     // 1. Register/Login to get Token
     const user = { name: 'TestUser', email: `test${Date.now()}@example.com`, password: 'password123' };
-    await axios.post(`${BASE_URL}/user/register`, user).catch(() => {}); // Ignore if exists
+    await axios.post(`${BASE_URL}/user/register`, user).catch(() => { }); // Ignore if exists
     const loginRes = await axios.post(`${BASE_URL}/user/login`, { email: user.email, password: user.password });
     TOKEN = loginRes.data.token;
     console.log('Got Token');
@@ -28,13 +28,13 @@ async function run() {
 
     // 4. Delete File
     await axios.delete(`${BASE_URL}/file/${fileId}`, {
-        headers: { Authorization: `Bearer ${TOKEN}` }
+      headers: { Authorization: `Bearer ${TOKEN}` }
     });
     console.log('Deleted File');
 
     // 5. Check "My Files" (Should NOT be here)
     const myFilesRes = await axios.get(`${BASE_URL}/file`, {
-        headers: { Authorization: `Bearer ${TOKEN}` }
+      headers: { Authorization: `Bearer ${TOKEN}` }
     });
     const foundInMyFiles = myFilesRes.data.find(f => f._id === fileId);
     if (foundInMyFiles) console.error('FAIL: File still in My Files');
@@ -42,7 +42,7 @@ async function run() {
 
     // 6. Check "Trash" (SHOULD be here)
     const trashRes = await axios.get(`${BASE_URL}/file/trash`, {
-        headers: { Authorization: `Bearer ${TOKEN}` }
+      headers: { Authorization: `Bearer ${TOKEN}` }
     });
     const foundInTrash = trashRes.data.find(f => f._id === fileId);
     if (foundInTrash) console.log('PASS: File found in Trash');
@@ -50,8 +50,8 @@ async function run() {
 
     // Cleanup local test file
     if (fs.existsSync('test.txt')) {
-        fs.unlinkSync('test.txt');
-        console.log('Cleaned up local test file');
+      fs.unlinkSync('test.txt');
+      console.log('Cleaned up local test file');
     }
 
   } catch (err) {
